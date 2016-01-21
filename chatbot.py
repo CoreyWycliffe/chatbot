@@ -1,5 +1,7 @@
 import Legobot
 import ConfigParser
+from vendors.yelp import api
+
 
 def is_num(val):
     try:
@@ -12,6 +14,7 @@ def is_num(val):
         return True
     except:
         return False
+
 
 def tip_user(msg):
     #Initialize empty list of tipped users
@@ -54,6 +57,7 @@ def tip_user(msg):
         tips_file.write(f)
     return returnVal
 
+
 def print_tips(msg):
     import os
     import ConfigParser
@@ -80,6 +84,7 @@ def print_tips(msg):
         tipped = ", ".join(tipped)
         returnval = "Current tips: %s" % tipped
     return returnval
+
 
 def check_weather_by_zip(msg):
     # check_weather_by_zip
@@ -150,6 +155,7 @@ def check_weather_by_zip(msg):
         )
     return reply
 
+
 def cointoss(msg):
     import random
     """
@@ -187,6 +193,21 @@ def cointoss(msg):
             returnVal = str(toss)
     return returnVal
 
+
+def lunch(msg):
+    results = api.search('lunch','32832')
+
+    try:
+        business = []
+        for temp in results['businesses']:
+            business.append("%s: %s" % (temp['name'], temp['rating']))
+    except Exception as e:
+        return e
+    business = ", ".join(business)
+    returnval = "Choices: %s" % business
+    return returnval
+
+
 def xkcd(msg):
     import urllib2, re
     webpage = urllib2.urlopen('http://dynamic.xkcd.com/random/comic')
@@ -197,6 +218,7 @@ def xkcd(msg):
         altText = comic.group(2).replace("&#39;","'")
         returnVal = "%s %s" %(altText,"http:" + comic.group(1))
         return returnVal
+
 
 def main():
     config = ConfigParser.SafeConfigParser()
@@ -218,7 +240,7 @@ def main():
         chan_pass = None
         val = val.strip()
         val = val.split(' ')
-        
+
         if len(val) == 1:
             chan = val[0]
         if len(val) == 2:
@@ -234,16 +256,14 @@ def main():
         mybot = Legobot.legoBot(host=HOST,port=PORT,nick=NICK,chans=CHANS,hostpw=HOSTPW)
     else:
         mybot = Legobot.legoBot(host=HOST,port=PORT,nick=NICK,chans=CHANS)
-    #mybot.addFunc("!helloworld", helloWorld, "Ask your bot to say hello. Usage: !helloworld")
+#   mybot.addFunc("!helloworld", helloWorld, "Ask your bot to say hello. Usage: !helloworld")
     mybot.addFunc("!roll", cointoss, "Roll a magical N-sided die. Usage !roll [ N>1 sides ]")
-    #mybot.addFunc("!xkcd", xkcd, "Pulls a random XKCD comic. Usage: !xkcd")
+#   mybot.addFunc("!xkcd", xkcd, "Pulls a random XKCD comic. Usage: !xkcd")
     mybot.addFunc("!tip", tip_user, "Tip a specific user. Usage !tip [user]")
     mybot.addFunc("!weather", check_weather_by_zip, "Check weather by zipcode. Usage: !weather 36429")
     mybot.addFunc('!printtips', print_tips, "See who has been tipped")
+    mybot.addFunc('!lunch', print_tips, "Find a restaurant to go to for lunch")
     mybot.connect(isSSL=True)
-
-
-
 
 if __name__ == "__main__":
     main()
