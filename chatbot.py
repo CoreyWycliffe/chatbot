@@ -1,6 +1,6 @@
 import Legobot
 import ConfigParser
-from vendors.yelp import api
+from vendors.yelp import yelp
 
 
 def is_num(val):
@@ -194,18 +194,23 @@ def cointoss(msg):
     return returnVal
 
 
-def lunch(msg):
-    results = api.search('lunch','32832')
+def lunch(msg='default'):
+    import random
+    if msg == 'default':
+        results = yelp.setup(['-q', 'test'])
 
     try:
         business = []
-        for temp in results['businesses']:
-            business.append("%s: %s" % (temp['name'], temp['rating']))
+        length = results[u'businesses'].__len__()
+        rdm = random.randint(0, length-1)
+        temp = results.get('businesses')[rdm]
+#        for temp in results['businesses']:
+        business.append("%s(%s) - %s" % (temp['name'], temp['rating'], temp['url']))
     except Exception as e:
         return e
     business = ", ".join(business)
-    returnval = "Choices: %s" % business
-    return returnval
+    output = "Choices: %s" % business
+    return output
 
 
 def xkcd(msg):
@@ -221,49 +226,50 @@ def xkcd(msg):
 
 
 def main():
-    config = ConfigParser.SafeConfigParser()
-
-    config.read("chatbot.cfg")
-    HOST = config.get('Main','host')
-    PORT = config.getint('Main','port')
-    NICK = config.get('Main','nick')
-    HOSTPW = None
-
-    try:
-        HOSTPW = config.get('Main','hostpw')
-    except:
-        print "Host password not found, skipping..."
-
-    CHANS = []
-    for (key, val) in config.items('Channels'):
-        chan = None
-        chan_pass = None
-        val = val.strip()
-        val = val.split(' ')
-
-        if len(val) == 1:
-            chan = val[0]
-        if len(val) == 2:
-            chan = val[0]
-            chan_pass = val[1]
-
-        if chan_pass:
-            CHANS.append((chan,chan_pass))
-        else:
-            CHANS.append((chan,''))
-
-    if HOSTPW:
-        mybot = Legobot.legoBot(host=HOST,port=PORT,nick=NICK,chans=CHANS,hostpw=HOSTPW)
-    else:
-        mybot = Legobot.legoBot(host=HOST,port=PORT,nick=NICK,chans=CHANS)
-#   mybot.addFunc("!helloworld", helloWorld, "Ask your bot to say hello. Usage: !helloworld")
-    mybot.addFunc("!roll", cointoss, "Roll a magical N-sided die. Usage !roll [ N>1 sides ]")
-#   mybot.addFunc("!xkcd", xkcd, "Pulls a random XKCD comic. Usage: !xkcd")
-    mybot.addFunc("!tip", tip_user, "Tip a specific user. Usage !tip [user]")
-    mybot.addFunc("!weather", check_weather_by_zip, "Check weather by zipcode. Usage: !weather 36429")
-    mybot.addFunc('!printtips', print_tips, "See who has been tipped")
-    mybot.addFunc('!lunch', print_tips, "Find a restaurant to go to for lunch")
-    mybot.connect(isSSL=True)
+#     config = ConfigParser.SafeConfigParser()
+#
+#     config.read("chatbot.cfg")
+#     HOST = config.get('Main','host')
+#     PORT = config.getint('Main','port')
+#     NICK = config.get('Main','nick')
+#     HOSTPW = None
+#
+#     try:
+#         HOSTPW = config.get('Main','hostpw')
+#     except:
+#         print "Host password not found, skipping..."
+#
+#     CHANS = []
+#     for (key, val) in config.items('Channels'):
+#         chan = None
+#         chan_pass = None
+#         val = val.strip()
+#         val = val.split(' ')
+#
+#         if len(val) == 1:
+#             chan = val[0]
+#         if len(val) == 2:
+#             chan = val[0]
+#             chan_pass = val[1]
+#
+#         if chan_pass:
+#             CHANS.append((chan,chan_pass))
+#         else:
+#             CHANS.append((chan,''))
+#
+#     if HOSTPW:
+#         mybot = Legobot.legoBot(host=HOST,port=PORT,nick=NICK,chans=CHANS,hostpw=HOSTPW)
+#     else:
+#         mybot = Legobot.legoBot(host=HOST,port=PORT,nick=NICK,chans=CHANS)
+# #   mybot.addFunc("!helloworld", helloWorld, "Ask your bot to say hello. Usage: !helloworld")
+#     mybot.addFunc("!roll", cointoss, "Roll a magical N-sided die. Usage !roll [ N>1 sides ]")
+# #   mybot.addFunc("!xkcd", xkcd, "Pulls a random XKCD comic. Usage: !xkcd")
+#     mybot.addFunc("!tip", tip_user, "Tip a specific user. Usage !tip [user]")
+#     mybot.addFunc("!weather", check_weather_by_zip, "Check weather by zipcode. Usage: !weather 36429")
+#     mybot.addFunc('!printtips', print_tips, "See who has been tipped")
+#     mybot.addFunc('!lunch', print_tips, "Find a restaurant to go to for lunch Usage: !lunch")
+#     mybot.connect(isSSL=True)
+    print lunch()
 
 if __name__ == "__main__":
     main()
