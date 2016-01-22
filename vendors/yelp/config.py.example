@@ -1,3 +1,4 @@
+# Remove the .example and create a python file with these params
 API_HOST = 'api.yelp.com'
 DEFAULT_TERM = 'lunch'
 DEFAULT_LOCATION = '123 first st.'
