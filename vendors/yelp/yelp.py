@@ -65,18 +65,25 @@ def request(host, path, url_params=None):
     return response
 
 
-def search(term, location):
+def search(term, location, radius):
     """Query the Search API by a search term and location.
     Args:
         term (str): The search term passed to the API.
         location (str): The search location passed to the API.
+        radius (str): The search radius (meters) passed to the API
     Returns:
         dict: The JSON response from the request.
     """
 
+    if unicode(radius, 'utf-8').isnumeric():
+        rad = radius.replace(' ', '+')
+    else:
+        rad = config.RADIUS_LIMIT
+
     url_params = {
         'term': term.replace(' ', '+'),
         'location': location.replace(' ', '+'),
+        'radius_filter': rad,
         'limit': config.SEARCH_LIMIT
     }
     return request(config.API_HOST, config.SEARCH_PATH, url_params=url_params)
@@ -94,13 +101,14 @@ def get_business(business_id):
     return request(config.API_HOST, business_path)
 
 
-def query_api(term, location):
+def query_api(term, location, radius):
     """Queries the API by the input values from the user.
     Args:
         term (str): The search term to query.
         location (str): The location of the business to query.
+        radius (str): The search radius from the location.
     """
-    response = search(term, location)
+    response = search(term, location, radius)
     return response
 
     # businesses = response.get('businesses')
@@ -128,11 +136,14 @@ def setup(args):
     parser.add_argument('-l', '--location', dest='location',
                         default=config.DEFAULT_LOCATION, type=str,
                         help='Search location (default: %(default)s)')
+    parser.add_argument('-r', '--radius', dest='radius',
+                        default=config.RADIUS_LIMIT, type=str,
+                        help='Radius Limit (in meters)')
 
     input_values = parser.parse_args(args)
 
     try:
-        return query_api(input_values.term, input_values.location)
+        return query_api(input_values.term, input_values.location, input_values.radius)
     except urllib2.HTTPError as error:
         sys.exit(
             'Encountered HTTP error {0}. Abort program.'.format(error.code))

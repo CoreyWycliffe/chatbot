@@ -16,6 +16,14 @@ def is_num(val):
         return False
 
 
+def miles_2_meters(miles):
+    if is_num(miles):
+        meters = miles * 1609.344
+        return meters
+    else:
+        return False
+
+
 def tip_user(msg):
     #Initialize empty list of tipped users
     import os
@@ -196,8 +204,27 @@ def cointoss(msg):
 
 def lunch(msg='default'):
     import random
+    search = 'lunch'
+
     if msg == 'default':
-        results = yelp.setup(['-q', 'test'])
+        results = yelp.setup(['-q', search])
+    elif not msg.arg1:
+        results = yelp.setup(['-q', search])
+    else:
+        import argparse
+        parser = argparse.ArgumentParser()
+
+        parser.add_argument('-q', '--term', dest='term', default=config.DEFAULT_TERM,
+                         type=str, help='Search term (default: %(default)s)')
+        parser.add_argument('-l', '--location', dest='location',
+                          default=config.DEFAULT_LOCATION, type=str,
+                         help='Search location (default: %(default)s)')
+         parser.add_argument('-r', '--radius', dest='radius',
+                           default=config.RADIUS_LIMIT, type=str,
+                          help='Radius Limit (in meters)')
+
+        input_values = parser.parse_args(args)
+        yelp.setup(['-q', search, '-r',])
 
     try:
         business = []
@@ -205,12 +232,11 @@ def lunch(msg='default'):
         rdm = random.randint(0, length-1)
         temp = results.get('businesses')[rdm]
 #        for temp in results['businesses']:
-        business.append("%s(%s) - %s" % (temp['name'], temp['rating'], temp['url']))
+        business.append("%s(%s) - %s" % (temp['name'], temp['rating'], ''.join(temp['location']['display_address']), temp['url']))
     except Exception as e:
         return e
     business = ", ".join(business)
-    output = "Choices: %s" % business
-    return output
+    return business
 
 
 def xkcd(msg):
