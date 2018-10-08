@@ -1,4 +1,4 @@
-import Legobot
+﻿import Legobot
 import ConfigParser
 from vendors.yelp import yelp
 
@@ -219,8 +219,8 @@ def lunch(msg='default'):
         parser.add_argument('-l', '--location', dest='location',
                           default=config.DEFAULT_LOCATION, type=str,
                          help='Search location (default: %(default)s)')
-         parser.add_argument('-r', '--radius', dest='radius',
-                           default=config.RADIUS_LIMIT, type=str,
+        parser.add_argument('-r', '--radius', dest='radius',
+                          default=config.RADIUS_LIMIT, type=str,
                           help='Radius Limit (in meters)')
 
         input_values = parser.parse_args(args)
